@@ -9,99 +9,102 @@ import java.util.Random;
  * Created by Nazar on 21.02.2015.
  */
 public class Battle {
-    int myDroidTurn;
-    int enemyDroidTurn;
-    int myDroidIndex;
+    int myDroidTurn = -1;
+    int enemyDroidTurn = -1;
+    //int myDroidIndex;
     int turnNumber = 1;
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
 
     public Battle(Team myTeam, Team enemyTeam) {
         while (!myTeam.getDroidList().isEmpty() && !enemyTeam.getDroidList().isEmpty()) {
-            System.out.println("Turn number " + turnNumber++);
-            myTurn(myTeam, enemyTeam);
-
+            System.out.println("Enemy team: ");
             enemyTeam.showInfo();
 
-            //enemyTurn(myTeam, enemyTeam);
-            //showInfo(enemyTeam);
+            myTurn(myTeam, enemyTeam);
+
+            try {
+                enemyTurn(myTeam, enemyTeam);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (!myTeam.getDroidList().isEmpty()) {
+                System.out.println("My team: ");
+                myTeam.showInfo();
+            }
+            else {
+                System.out.println("Enemy team: ");
+                enemyTeam.showInfo();
+            }
+
         }
+        if (myTeam.getDroidList().size() >= 1) {
+            System.out.println("YOU WIN!!!");
+        }
+        else System.out.println("You lose!");
     }
 
+    private int enemyTurnAI(Team myTeam) {
+        int target;
 
-    private void enemyTurn(Team myTeam, Team enemyTeam) { // not done yet
-
-        Random random = new Random();
-        if (myDroidIndex == 0) myDroidIndex = random.nextInt(5);  // choose random index of droid to fight
+        if (turnNumber <=2){
+            target = chooseRandomTarget(myTeam);
+        }
+        else if (myTeam.getDroidList().size() == 4)
+            target = chooseRandomTarget(myTeam);
+        else if (myTeam.getDroidList().size() == 3)
+            target = chooseRandomTarget(myTeam);
+        else if (myTeam.getDroidList().size() == 2)
+            target = chooseRandomTarget(myTeam);
         else
+            target = 0;
+        return target;
+    }
 
-            shootEnemyDroid(enemyTeam, myTeam, enemyDroidTurn, myDroidIndex);
-        turn(enemyDroidTurn, enemyTeam);
-        System.out.println(turnNumber++);
+    private int chooseRandomTarget(Team myTeam) {
+        Random random = new Random();
+        return random.nextInt(myTeam.getDroidList().size() - 1) + 1;
+    }
+
+    private void enemyTurn(Team myTeam, Team enemyTeam) throws InterruptedException { // not done yet
+        if (enemyTeam.getDroidList().isEmpty()) return;
+        turnEnemy(enemyDroidTurn, enemyTeam);
+        System.out.println("    Turn number " + turnNumber);
+        System.out.println("Enemy's " + enemyTeam.getDroidList().get(enemyDroidTurn) + " turnEnemy");
+        System.out.println("Enemy is attacking your " + myTeam.getDroidList().get(enemyTurnAI(myTeam)));
+
+
+        //Thread.sleep(2000);
+        shootEnemyDroid(enemyTeam, myTeam, enemyDroidTurn, enemyTurnAI(myTeam));
+        //Thread.sleep(2000);
+        turnNumber++;
     }
 
     private void myTurn(Team myTeam, Team enemyTeam) {
-
+        System.out.println("    Turn number " + turnNumber);
+        turn(myDroidTurn, myTeam);
         String enemyIndex;
         int enemyDroidIndex;
 
-        if (turnNumber <= 2) {
-            enemyTeam.showInfo();
-        }
-        /*try {
-            System.out.println(myTeam.getDroidList().get(myDroidTurn) + " turn");
-            System.out.print("Choose your enemy!\n");
-            enemyTeam.showInfo();
-            enemyIndex = reader.readLine();
-
-            while (enemyIndex.isEmpty() ||Integer.parseInt(enemyIndex) > enemyTeam.getDroidList().size() ||Integer.parseInt(enemyIndex) <= 0) {
-                if (enemyIndex.isEmpty()) {
-                    System.out.println("You haven't enter anything!");
-
-                }
-
-                else if (Integer.parseInt(enemyIndex) <= 0) {
-                    System.out.println("Please, choose existing enemy: 1-" + enemyTeam.getDroidList().size());
-                }
-                else {
-                    System.out.println("Enemy team is smaller than " + enemyIndex + " units!");
-                    System.out.println("Please, choose existing enemy: 1-" + enemyTeam.getDroidList().size());
-                }
-                enemyIndex = reader.readLine();
-            }
-
-            enemyDroidIndex = Integer.parseInt(enemyIndex) - 1;
-            shootEnemyDroid(myTeam, enemyTeam, myDroidTurn, enemyDroidIndex);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NumberFormatException e) {
-            System.out.println("Please, choose existing enemy: 1-" + enemyTeam.getDroidList().size());
-            return;
-        }
-        System.out.println(turnNumber++);
-        turn(myDroidTurn, myTeam);*/
-        System.out.println(myTeam.getDroidList().get(myDroidTurn) + " turn");
+        System.out.println("Your " + myTeam.getDroidList().get(myDroidTurn) + " turnEnemy");
         System.out.print("Choose your enemy!\n");
 
         try {
-
-            enemyIndex = reader.readLine();
-
-
+            do {
+                enemyIndex = reader.readLine();
+                if (!enemyIndex.matches("[1-5]") || Integer.parseInt(enemyIndex) > enemyTeam.getDroidList().size()){
+                    System.out.println("Invalid request. Please enter number: 1-" + enemyTeam.getDroidList().size());
+                }
+            }
+            while (!enemyIndex.matches("[1-5]"));
             enemyDroidIndex = Integer.parseInt(enemyIndex) - 1;
             shootEnemyDroid(myTeam, enemyTeam, myDroidTurn, enemyDroidIndex);
-        } catch (IndexOutOfBoundsException e) {
-
-            System.out.println("Please, choose existing enemy: 1-" + enemyTeam.getDroidList().size());
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
-        turn(myDroidTurn, myTeam);
-
+        turnNumber++;
     }
 
     private void turn(int turn, Team Team) {
@@ -112,7 +115,15 @@ public class Battle {
         else if(turn >= Team.getDroidList().size() - 1) {
             myDroidTurn = 0;
         }
+    }
+    private void turnEnemy(int turn, Team Team) {
 
+        if (turn < Team.getDroidList().size() - 1) {
+            enemyDroidTurn++;
+        }
+        else if(turn >= Team.getDroidList().size() - 1) {
+            enemyDroidTurn = 0;
+        }
     }
 
     private static void shootEnemyDroid(Team myTeam, Team enemyTeam, int myDroidIndex, int enemyDroidIndex) {

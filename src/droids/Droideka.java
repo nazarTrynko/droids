@@ -7,7 +7,7 @@ public class Droideka extends Droid implements Shoot{
 
     public Droideka() {
 
-        setDamageLevel(20);
+        setDamageLevel(40);
         setEnergyLevel(100);
         setHealth(100);
         setDamageRate(getEnergyLevel() / 10);

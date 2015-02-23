@@ -52,6 +52,7 @@ public class Team{
     }
 
     public void showInfo() {
+
         for (int i = 1; i <= getDroidList().size(); i++)
             System.out.println(i + ". " + getDroidList().get(i - 1));
 

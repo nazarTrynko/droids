@@ -10,7 +10,7 @@ public class BattleDroid  extends Droid{
     }
 
     public BattleDroid() {
-        setDamageLevel(15);
+        setDamageLevel(50);
         setEnergyLevel(50);
         setHealth(200);
 

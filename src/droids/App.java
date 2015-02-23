@@ -5,7 +5,7 @@ package droids;
  */
 public class App {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         System.out.println("Choose your droids!\n");
 
@@ -16,6 +16,16 @@ public class App {
         System.out.println("\nChoose enemy droids!\n");
         Team team2 = new Team();
 
+        System.out.println("Battle starts at: 3");
+        Thread.sleep(1000);
+
+        System.out.println("Battle starts at: 2");
+        Thread.sleep(1000);
+
+        System.out.println("Battle starts at: 1");
+        Thread.sleep(1000);
+        System.out.println("GO!");
+        Thread.sleep(1000);
         Battle battle = new Battle(team1, team2);
 
     }
